@@ -1987,7 +1987,7 @@ http://www.avx.com/docs/Catalogs/9177.pdf</description>
 <junction x="-101.6" y="35.56"/>
 </segment>
 </net>
-<net name="MOTOR+" class="0">
+<net name="MOTORPOSITIVE" class="0">
 <segment>
 <wire x1="-38.1" y1="-15.24" x2="-38.1" y2="-12.7" width="0.1524" layer="91"/>
 <wire x1="-38.1" y1="-12.7" x2="-78.74" y2="-12.7" width="0.1524" layer="91"/>
