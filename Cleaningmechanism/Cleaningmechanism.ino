@@ -14,8 +14,8 @@ void setup() {
   // put your setup code here, to run once:
   pinMode(trigPin, OUTPUT);     //trig is output as it outputs a pulse
   pinMode(echoPin,INPUT);   //echopin is input as it measures the duration of the return pulse
-  pinMode(sig1, INPUT);     // signal1 is the input signal from wattmon(only wattmon not particle)
-  pinMode(sig2, INPUT);     //signal1 is the input signal from wattmon(only wattmon not particle)
+  pinMode(sig1, INPUT_PULLUP);     // signal1 is the input signal from wattmon(only wattmon not particle)
+  pinMode(sig2, INPUT_PULLUP);     //signal1 is the input signal from wattmon(only wattmon not particle)
   pinMode(solenoid, OUTPUT);  //solenoid is output for relay pin
   for(i = 0;i < 4; i++) {     //loop to initialize the relay pins that controls the relay
     pinMode(R[i],OUTPUT);       
@@ -41,22 +41,22 @@ void loop() {
   delay(100);  
   //Serial.println("signal2");
   //Serial.println(signal2);
-  if(signal1 == HIGH && signal2 == LOW) {   //if statement that proceeds only when signal 1 is high (signal1 from wattmon)
-    //  Serial.println("I am in signal1");
+  if(signal1 == LOW && signal2 == HIGH) {   //if statement that proceeds only when signal 1 is low (signal1 from wattmon)
+      //Serial.println("I am in signal1");
     
-    cleaning(2);  //the value two is minimum distance that the bot will go near the reference point
+    cleaning(100);  //the value two is minimum distance that the bot will go near the reference point
     /*passing the value of 2 mean, its will go in forward direction until the distance between bot and the reference point is 2 cm */
     
-    signal1 = LOW; //make the signal low after cleaning is done, so that it doesn't trigger again
+    signal1 = HIGH; //make the signal HIGH after cleaning is done, so that it doesn't trigger again. it will automatically go high when the signal stops, but just in cases
     
     delay(2000); //delay of 2 seconds so that loop rest and wait for the wattmon to cut the signal off (wattmon is slow)
       }
-   if(signal1 == LOW && signal2 == HIGH) {   //if statement that proceeds only when signal 2 is high (signal1 from wattmon)
+   if(signal1 == HIGH && signal2 == LOW) {   //if statement that proceeds only when signal 2 is low (signal1 from wattmon)
       //Serial.println("I am  in signal2");
       
-      cleaning(2); //signal 2 is for cleaning both the panels
+      cleaning(35); //signal 2 is for cleaning both the panels
       
-      signal2 = LOW; //make the signal low after cleaning is done so that it doesnt trigger cleaning again
+      signal2 = HIGH ; //make the signal HIGH after cleaning is done so that it doesnt trigger cleaning again
       delay(2000); //delay of 2 seconds so that loop rest and wait for the wattmon to cut the signal off (wattmon is slow)
     }
 }
@@ -65,7 +65,7 @@ int distance() {      //this function return distance is uses ultrasound sensor 
     distancecm = 0;     //initialization
     duration = 0;       //" "
     digitalWrite(trigPin, LOW); //trigPin is held LOW for 4 microsecond
-    delayMicroseconds(5);
+    delayMicroseconds(10);
     digitalWrite(trigPin, HIGH); //then HIGH for 10 microseconds
     delayMicroseconds(10);    
     digitalWrite(trigPin, LOW); //then it is pulled LOW 
@@ -75,8 +75,8 @@ int distance() {      //this function return distance is uses ultrasound sensor 
     /*Once the signal that is sent is received by the sensor, the echo pin will go high for a duration. This duration will depend 
     on the time taken by the ultrasound signal sent by the sensor to reach back after getting reflected from a object. So, measuring this duration
     gives us the time taken by the ultrasound to go, hit the object and comeback to the sensor*/
-    distancecm = ((int)duration *0.034)/2;  //distance can be calulated from time and speed of sound
-    //Serial.println(distancecm);
+    distancecm = (((int)duration *0.034)/2 );  //distance can be calulated from time and speed of sound
+    Serial.println(distancecm);
     return distancecm;    //returns the calculated distance
 }
 
@@ -124,15 +124,15 @@ void cleaning (int panel) { //this function is the heart of the bot
     do {
       forwards();
       temp = distance();
-      delay(20);
-    }while(!(temp >= panel-1 && temp <= panel+1) ); 
+      delay(50);
+      }while(!(temp >=10 && temp <= panel+2 ) ); 
     stopfunc();
     delay(1000);
     do{
       reverse(); 
       temp = distance();
-      delay(20);
-     }while(!(temp >=34 && temp <=36 ));
+      delay(50);
+     }while(!(temp >=170 ));
      stopfunc();
     digitalWrite(pump, HIGH); // switch off pump after cleaning
     delay(1000); //
